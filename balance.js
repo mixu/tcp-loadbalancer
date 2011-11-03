@@ -11,9 +11,7 @@ var backends = [
   { host: 'localhost', port: 8002 }
 ];
 
-var server = new LoadBalancer(function(enabled) {
-  return enabled[Math.floor(Math.random() * enabled.length)];
-});
+var server = new LoadBalancer();
 server.backends(backends);
 server.only(1);
 server.listen(config.port, config.host);

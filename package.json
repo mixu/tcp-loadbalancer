@@ -1,0 +1,10 @@
+{ "name": "tcp-loadbalancer",
+  "description": "A TCP load balancer for testing load balancing",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url":  "git://github.com/mixu/tcp-loadbalancer.git" },
+  "dependencies": { },
+  "main": "./lib/load_balancer.js",
+  "private":true
+}

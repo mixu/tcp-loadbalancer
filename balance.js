@@ -3,43 +3,58 @@ var LoadBalancer = require('./lib/load_balancer');
 
 var config = {
   host: 'localhost',
-  port: 8000
+  port: 843
 };
 
 var backends = [
   { host: 'localhost', port: 8001 },
   { host: 'localhost', port: 8002 }
 ];
-var enabled = Object.keys(backends);
 
-var server = new LoadBalancer(function() {
+var server = new LoadBalancer(function(enabled) {
   return enabled[Math.floor(Math.random() * enabled.length)];
 });
 server.backends(backends);
+server.only(1);
 server.listen(config.port, config.host);
 console.log('Server running at', config.host, config.port);
 
 var context = {
   // Show status
   status: function() {
+    var enabled = server.enabled();
     console.log('Status:');
     backends.forEach(function(backend, index) {
       console.log(index+'   '+(enabled.indexOf(''+index) > -1 ? 'enabled ' : 'disabled')+'    '+backend.host, ':', backend.port);
     });
   },
-  // Toggle backends
-  toggle: function(index) {
+  // Enable/disable backends
+  enable: function(index) {
     if(index === undefined) {
-      console.log('Usage: toggle(index)');
+      console.log('Usage: enable(index)');
       return;
     }
-    var pos = enabled.indexOf(''+index);
-    if(pos < 0) {
-      enabled.push(''+index);
-    } else {
-      enabled.splice(pos, 1);
-    }
+    server.enable(index);
     context.status();
+  },
+  disable: function(index) {
+    if(index === undefined) {
+      console.log('Usage: disable(index)');
+      return;
+    }
+    server.disable(index);
+    context.status();
+  },
+  only: function(index) {
+    server.only(index);
+    server.forceDisconnects();
+    context.status();
+  },
+  log: function() {
+    server.log();
+  },
+  connections: function() {
+    server.connections();
   }
 };
 
